@@ -172,8 +172,6 @@
                 <label for="rate">貸款利率</label>
                 <input type="number" id="rate" name="rate" value="1.85" step="0.01" min="1"> %
             </div>
-            <!-- 新增手續費用欄位  handlingFree-->
-
             <div class="form-row">
                 <label for="loanYears">貸款年限</label>
                 <select name="loanYears" id="loanYears">
@@ -192,7 +190,8 @@
                 <input type="radio" id="repayment1" name="repayment" value="repaymentMethod1" checked>本金平均攤還
                 <input type="radio" id="repayment2" name="repayment" value="repaymentMethod2">本息平均攤還
             </div>
-            <button type="button" id="calcBtn">計算</button>
+            <!-- 後端才需要submit -->
+            <button type="button" id="clacBtn">計算</button>
 
         </form>
         <h2>｜試算結果</h2>
@@ -208,15 +207,15 @@
                 <tbody>
                     <tr>
                         <td>每月還款金額</td>
-                        <td id="monthlyPayment">6666</td>
+                        <td id="monthlyPayment">-</td>
                     </tr>
                     <tr>
                         <td>總還款金額</td>
-                        <td id="totalPayment">166666</td>
+                        <td id="totalPayment">-</td>
                     </tr>
                     <tr>
                         <td>總利息支出</td>
-                        <td id="totalInterest">3666666</td>
+                        <td id="totalInterest">-</td>
                     </tr>
                 </tbody>
             </table>
@@ -231,75 +230,91 @@
                         <th>利息</th>
                         <th>剩餘本金</th>
                     </tr>
+                </thead>
+                <tbody id="scheduleBody">
 
+                </tbody>
+            </table>
         </div>
     </div>
 
+
     <script>
-        const title = document.querySelector("h1");
-        console.log(title);
+        // const title = document.querySelector("h1");
+        // console.log(title);
 
-        title.style.color = "orange";
+        // title.style.color = "orange";
 
-        title.innerText = "超級助手!";
-        title.innerHTML = "<b style='background-color:blue'>超級助手!</b>";
+        // // 1.只改文字 
+        // title.innerText = "超級助手!";
+        // //2.含標籤語法
+        // title.innerHTML = "<b style='background-color:blue'>超級助手!</b>";
+
         const amountEl = document.querySelector("#amount");
         const rateEl = document.querySelector("#rate");
         const loanYearsEl = document.querySelector("#loanYears");
-        const calcBtnEl = document.querySelector("#calcBtn");
+        const calcBtnEl = document.querySelector("#clacBtn");
         console.log(amountEl, rateEl, loanYearsEl, calcBtnEl);
 
-        calcBtn.addEventListener("click", function (e) {
+        calcBtnEl.addEventListener("click", function (e) {
             let amount = amountEl.value;
             let rate = rateEl.value;
             let loanYears = loanYearsEl.value;
 
+            //多個radio共用name的取值方式`
             let method = document.querySelector(
                 "input[name='repayment']:checked"
             ).value;
 
 
-
             console.log(amount, rate, loanYears, method);
+
             let schedules = repaymentMethod1(amount * 10000, rate, loanYears);
+
             renderTable(schedules);
-
-
         });
 
+        //繪製Table
         function renderTable(schedules) {
             let tableHtml = "";
+
 
             for (let i = 0; i < schedules.length; i++) {
                 tableHtml += `
                     <tr>
-                        <td>${schedules[i].moth}</td>
-                        <td>${schedules[i].monthlyPayment + schedules[i].intrest}</td>
-                        <td>${schedules[i].monthlyPayment}</td>
-                        <td>${schedules[i].interest}</td>
-                        <td>${schedules[i].amount}</td>
-                    </tr>`;
-
-
-
+                        <td> ${schedules[i].month}</td>
+                        <td> ${schedules[i].monthlyPayment + schedules[i].interest}</td>
+                        <td> ${schedules[i].monthlyPayment}</td>
+                        <td> ${schedules[i].interest}</td>
+                        <td> ${schedules[i].amount}</td>
+                    </tr>
+                `;
             }
 
+            console.log(tableHtml);
+
+            document.querySelector("#scheduleBody").innerHTML = tableHtml;
         }
 
+        //本金平均攤還
         function repaymentMethod1(amount, rate, years) {
             let monthRate = rate / 100 / 12; //月利率
             let months = years * 12;    //總期數
+
             let monthlyPayment = Math.round(amount / months);
             console.log(monthRate, months, monthlyPayment);
+
             schedules = [];
             for (let i = 0; i < months; i++) {
                 let interest = Math.round(amount * monthRate);
                 amount -= monthlyPayment;
+
                 //最後一期
                 if (i == months - 1) {
                     monthlyPayment += amount;
                     amount = 0;
                 }
+
                 console.log(`${i + 1} 本金:${monthlyPayment} 利息:${interest} 剩餘餘額:${amount}`);
                 schedules.push(
                     {
@@ -309,10 +324,14 @@
                         "amount": amount
                     }
                 );
+
             }
+
             console.log(schedules);
+
             return schedules;
         }
+
     </script>
 </body>
 
