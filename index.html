@@ -308,37 +308,38 @@
             console.log(monthRate, months, monthlyPayment);
 
             schedules = [];
+            let totalPayment = 0;
+            let totalInterest = 0;
+            let remainingAmount = amount;
             for (let i = 0; i < months; i++) {
-                let interest = Math.round(amount * monthRate);
-                amount -= monthlyPayment;
+                let interest = Math.round(remainingAmount * monthRate);
+                let principal = monthlyPayment;
+                remainingAmount -= principal;
 
                 //最後一期
                 if (i == months - 1) {
-                    monthlyPayment += amount;
-                    amount = 0;
+                    principal += remainingAmount;
+                    remainingAmount = 0;
                 }
 
-                console.log(`${i + 1} 本金:${monthlyPayment} 利息:${interest} 剩餘餘額:${amount}`);
+                totalPayment += principal + interest;
+                totalInterest += interest;
+
+                console.log(`${i + 1} 本金:${principal} 利息:${interest} 剩餘餘額:${remainingAmount}`);
                 schedules.push(
                     {
                         "month": i + 1,
-                        "monthlyPayment": monthlyPayment,
+                        "monthlyPayment": principal,
                         "interest": interest,
-                        "amount": amount
+                        "amount": remainingAmount
                     }
                 );
             }
 
+            const firstMonthly = schedules[0].monthlyPayment + schedules[0].interest;
+
             document.getElementById('monthlyPayment').textContent
-                = Math.round(schedules[0].monthlyPayment + schedules[0].interest).toLocaleString('zh-TW') + '元';
-
-            let totalPayment = 0;
-            let totalInterest = 0;
-            for (let i = 0; i < schedules.length; i++) {
-                totalPayment += schedules[i].monthlyPayment + schedules[i].interest;
-                totalInterest += schedules[i].interest;
-            }
-
+                = Math.round(firstMonthly).toLocaleString('zh-TW') + '元';
             document.getElementById('totalPayment').textContent
                 = Math.round(totalPayment).toLocaleString('zh-TW') + '元';
             document.getElementById('totalInterest').textContent
