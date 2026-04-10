@@ -207,15 +207,15 @@
                 <tbody>
                     <tr>
                         <td>每月還款金額</td>
-                        <td id="monthlyPayment">-</td>
+                        <td id="monthlyPayment"></td>
                     </tr>
                     <tr>
                         <td>總還款金額</td>
-                        <td id="totalPayment">-</td>
+                        <td id="totalPayment"></td>
                     </tr>
                     <tr>
                         <td>總利息支出</td>
-                        <td id="totalInterest">-</td>
+                        <td id="totalInterest"></td>
                     </tr>
                 </tbody>
             </table>
@@ -249,7 +249,9 @@
         // title.innerText = "超級助手!";
         // //2.含標籤語法
         // title.innerHTML = "<b style='background-color:blue'>超級助手!</b>";
-
+        function calculate() {
+            console.log("計算中...");
+        }
         const amountEl = document.querySelector("#amount");
         const rateEl = document.querySelector("#rate");
         const loanYearsEl = document.querySelector("#loanYears");
@@ -261,28 +263,18 @@
             let rate = rateEl.value;
             let loanYears = loanYearsEl.value;
 
-            document.getElementById('monthlyPayment').textContent
-                = Math.round(schedule[0].payment).toLocaleString('zh-TW') + '元';
-
-            document.getElementById('totalPayment').textContent
-                = Math.round(totalPayment).toLocaleString('zh-TW') + '元 ';
-
-            document.getElementById('totalInterest').textContent
-                = Math.round(totalInterest).toLocaleString('zh-TW') + '元';
-
-
-
             //多個radio共用name的取值方式`
             let method = document.querySelector(
                 "input[name='repayment']:checked"
             ).value;
-
 
             console.log(amount, rate, loanYears, method);
 
             let schedules = repaymentMethod1(amount * 10000, rate, loanYears);
 
             renderTable(schedules);
+
+
         });
 
         //繪製Table
@@ -334,12 +326,23 @@
                         "interest": interest,
                         "amount": amount
                     }
-
                 );
-
             }
 
-            console.log(schedules);
+            document.getElementById('monthlyPayment').textContent
+                = Math.round(schedules[0].monthlyPayment + schedules[0].interest).toLocaleString('zh-TW') + '元';
+
+            let totalPayment = 0;
+            let totalInterest = 0;
+            for (let i = 0; i < schedules.length; i++) {
+                totalPayment += schedules[i].monthlyPayment + schedules[i].interest;
+                totalInterest += schedules[i].interest;
+            }
+
+            document.getElementById('totalPayment').textContent
+                = Math.round(totalPayment).toLocaleString('zh-TW') + '元';
+            document.getElementById('totalInterest').textContent
+                = Math.round(totalInterest).toLocaleString('zh-TW') + '元';
 
             return schedules;
         }
