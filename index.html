@@ -123,6 +123,11 @@
             font-weight: bold;
         }
 
+        .summary-table td:nth-child(2n),
+        .summary-table th:nth-child(2n) {
+            text-align: right;
+        }
+
 
 
 
@@ -145,6 +150,7 @@
             padding: 10px 12px;
             text-align: left;
         }
+
 
         .subtitle {
             font: 0.5em sans-serif;
@@ -194,7 +200,7 @@
             <button type="button" id="clacBtn">計算</button>
 
         </form>
-        <h2>｜試算結果</h2>
+        <h2>試算結果</h2>
         <div class="result">
             <!-- 摘要表格 -->
             <table class="summary-table">
