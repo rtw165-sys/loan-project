@@ -123,11 +123,6 @@
             font-weight: bold;
         }
 
-        .summary-table td:nth-child(2n),
-        .summary-table th:nth-child(2n) {
-            text-align: right;
-        }
-
 
 
 
@@ -150,7 +145,6 @@
             padding: 10px 12px;
             text-align: left;
         }
-
 
         .subtitle {
             font: 0.5em sans-serif;
@@ -200,7 +194,7 @@
             <button type="button" id="clacBtn">計算</button>
 
         </form>
-        <h2>試算結果</h2>
+        <h2>｜試算結果</h2>
         <div class="result">
             <!-- 摘要表格 -->
             <table class="summary-table">
@@ -213,56 +207,77 @@
                 <tbody>
                     <tr>
                         <td>每月還款金額</td>
-                        <td id="monthlyPayment"></td>
+                        <td id="monthlyPayment">-</td>
                     </tr>
                     <tr>
                         <td>總還款金額</td>
-                        <td id="totalPayment"></td>
+                        <td id="totalPayment">-</td>
                     </tr>
                     <tr>
                         <td>總利息支出</td>
-                        <td id="totalInterest"></td>
+                        <td id="totalInterest">-</td>
                     </tr>
                 </tbody>
             </table>
 
-            <!-- 分期明細表格 -->
-            <table border="1" class="detial-table">
-                <thead>
-                    <tr>
-                        <th>期數</th>
-                        <th>月付金額</th>
-                        <th>本金</th>
-                        <th>利息</th>
-                        <th>剩餘本金</th>
-                    </tr>
-                </thead>
-                <tbody id="scheduleBody">
+            <div id="table-scroll">
+                <!-- 分期明細表格 -->
+                <table border="1" class="detial-table">
+                    <thead>
+                        <tr>
+                            <th>期數</th>
+                            <th>月付金額</th>
+                            <th>本金</th>
+                            <th>利息</th>
+                            <th>剩餘本金</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleBody">
 
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
 
     <script>
-        // const title = document.querySelector("h1");
-        // console.log(title);
-
-        // title.style.color = "orange";
-
-        // // 1.只改文字 
-        // title.innerText = "超級助手!";
-        // //2.含標籤語法
-        // title.innerHTML = "<b style='background-color:blue'>超級助手!</b>";
-        function calculate() {
-            console.log("計算中...");
-        }
+        let schedules = [];
         const amountEl = document.querySelector("#amount");
         const rateEl = document.querySelector("#rate");
         const loanYearsEl = document.querySelector("#loanYears");
         const calcBtnEl = document.querySelector("#clacBtn");
-        console.log(amountEl, rateEl, loanYearsEl, calcBtnEl);
+        const exportBtnEl = document.querySelector("#exportBtn");
+
+        console.log(amountEl, rateEl, loanYearsEl, calcBtnEl, exportBtnEl);
+
+        exportBtnEl.addEventListener("click", function (e) {
+            console.log(schedules);
+
+            if (schedules.length == 0) {
+                alert("目前無資料，請先計算!");
+                return;
+            }
+
+            let data = [];
+            const headers = ["期數", "月付金額", "本金", "利息", "剩餘本金"];
+
+            for (let i = 0; i < schedules.length; i++) {
+                data.push(
+                    [
+                        schedules[i].month,
+                        schedules[i].monthlyPayment + schedules[i].interest,
+                        schedules[i].monthlyPayment,
+                        schedules[i].interest,
+                        schedules[i].amount
+                    ]
+                );
+            }
+
+            console.log(data);
+            downloadCSV(headers, data);
+        });
+
 
         calcBtnEl.addEventListener("click", function (e) {
             let amount = amountEl.value;
@@ -274,14 +289,37 @@
                 "input[name='repayment']:checked"
             ).value;
 
+
             console.log(amount, rate, loanYears, method);
 
-            let schedules = repaymentMethod1(amount * 10000, rate, loanYears);
-
+            schedules = repaymentMethod1(amount * 10000, rate, loanYears);
+            renderSummary(schedules);
             renderTable(schedules);
-
-
         });
+
+
+        function renderSummary(schedules) {
+            const monthlyPaymentEl = document.querySelector("#monthlyPayment");
+            const totalPaymentEl = document.querySelector("#totalPayment");
+            const totalInterestEl = document.querySelector("#totalInterest");
+
+            console.log(monthlyPaymentEl, totalPaymentEl, totalInterestEl);
+
+            monthlyPaymentEl.innerText = `第一個月還款：${schedules[0].monthlyPayment + schedules[0].interest}元`;
+
+            let totalInterest = 0, totalPayment = 0;
+            for (let i = 0; i < schedules.length; i++) {
+                totalInterest += schedules[i].interest;
+                totalPayment += schedules[i].monthlyPayment;
+            }
+
+            console.log(totalInterest, totalPayment);
+
+            totalPaymentEl.innerHTML = `<b style='color:blue'>${totalPayment + totalInterest}元</b>`;
+            totalInterestEl.innerHTML = `<b style='color:red'>${totalInterest}元</b>`;
+
+
+        }
 
         //繪製Table
         function renderTable(schedules) {
@@ -300,7 +338,7 @@
                 `;
             }
 
-            console.log(tableHtml);
+            //console.log(tableHtml);
 
             document.querySelector("#scheduleBody").innerHTML = tableHtml;
         }
@@ -342,10 +380,16 @@
                 );
             }
 
-            const firstMonthly = schedules[0].monthlyPayment + schedules[0].interest;
-
             document.getElementById('monthlyPayment').textContent
-                = Math.round(firstMonthly).toLocaleString('zh-TW') + '元';
+                = Math.round(schedules[0].monthlyPayment + schedules[0].interest).toLocaleString('zh-TW') + '元';
+
+            let totalPayment = 0;
+            let totalInterest = 0;
+            for (let i = 0; i < schedules.length; i++) {
+                totalPayment += schedules[i].monthlyPayment + schedules[i].interest;
+                totalInterest += schedules[i].interest;
+            }
+
             document.getElementById('totalPayment').textContent
                 = Math.round(totalPayment).toLocaleString('zh-TW') + '元';
             document.getElementById('totalInterest').textContent
