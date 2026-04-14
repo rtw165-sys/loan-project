@@ -15,36 +15,35 @@
     <div class="container">
         <h1>貸款精算助手
             <span class="subtitle">輸入條件，快速分析您的還款計畫</span>
-        </h1>
-        <form id="loanForm" action="" class="loan-form">
-            <div class="form-row">
-                <label for="amount">貸款金額</label>
-                <input type="number" id="amount" name="amount" value="100" step="10" min="10" required> 萬
-            </div>
-            <div class="form-row">
-                <label for="rate">貸款利率</label>
-                <input type="number" id="rate" name="rate" value="1.85" step="0.01" min="1"> %
-            </div>
-            <div class="form-row">
-                <label for="loanYears">貸款年限</label>
-                <select name="loanYears" id="loanYears">
-                    <option value="3">3</option>
-                    <option value="5">5</option>
-                    <option value="7" selected>7</option>
-                    <option value="10">10</option>
-                    <option value="15">15</option>
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                    <option value="40">40</option>
-                </select> 年
-            </div>
-            <div class="form-row">
-                <label for="repayment">還款方式</label>
-                <input type="radio" id="repayment1" name="repayment" value="repaymentMethod1" checked>本金平均攤還
-                <input type="radio" id="repayment2" name="repayment" value="repaymentMethod2">本息平均攤還
-            </div>
-            <!-- 後端才需要submit -->
-            <button type="button" id="clacBtn">計算</button>
+        </h1 id="loanForm" action="" class="loan-form">
+        <div class="form-row">
+            <label for="amount">貸款金額</label>
+            <input type="number" id="amount" name="amount" value="100" step="10" min="10" required> 萬
+        </div>
+        <div class="form-row">
+            <label for="rate">貸款利率</label>
+            <input type="number" id="rate" name="rate" value="1.85" step="0.01" min="1"> %
+        </div>
+        <div class="form-row">
+            <label for="loanYears">貸款年限</label>
+            <select name="loanYears" id="loanYears">
+                <option value="3">3</option>
+                <option value="5">5</option>
+                <option value="7" selected>7</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+            </select> 年
+        </div>
+        <div class="form-row">
+            <label for="repayment">還款方式</label>
+            <input type="radio" id="repayment1" name="repayment" value="repaymentMethod1" checked>本金平均攤還
+            <input type="radio" id="repayment2" name="repayment" value="repaymentMethod2">本息平均攤還
+        </div>
+        <!-- 後端才需要submit -->
+        <button type="button" id="clacBtn">計算</button>
 
         </form>
         <h2>｜試算結果
